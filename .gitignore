@@ -3,6 +3,8 @@ bin-debug/
 bin-release/
 [Oo]bj/
 [Bb]in/
+.vs/
+WasteZero/.vs
 
 # Other files and folders
 .settings/
