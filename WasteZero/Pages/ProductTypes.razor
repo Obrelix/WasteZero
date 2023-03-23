@@ -3,11 +3,13 @@
 @using Radzen;
 @using WasteZero.Data
 @using WasteZero.Models
+@using WasteZero.Services
 @page "/ProductTypes"
 @inject IDbContextFactory<WasteZeroDbContext> ProjectDataContextFactory;
 @inject NavigationManager NavigationManager
+@inject ProductTypeService service
 <PageTitle>Types</PageTitle>
-<RadzenButton ButtonStyle="ButtonStyle.Success" class="mt-2 mb-4" Text="Add New Product" Click="@InsertRow" Disabled=@(objToInsert != null || objToUpdate != null) />
+<RadzenButton ButtonStyle="ButtonStyle.Success" class="mt-2 mb-4" Text="Add New Type" Click="@InsertRow" Disabled=@(objToInsert != null || objToUpdate != null) />
 
 <RadzenDataGrid @ref="grid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="25" AllowSorting="true" EditMode="DataGridEditMode.Single"
                 Data="@productTypes" TItem="ProductType" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset"  FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
@@ -24,16 +26,20 @@
                 </RadzenButton>
                 <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(obj))">
                 </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(obj))">
-                </RadzenButton>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ProductType" Property="Code" Title="Code" Frozen="true">
+        <RadzenDataGridColumn TItem="ProductType" Property="Code" Title="Code" Frozen="true" Width="100px">
+            <Template Context="obj">
+                <p style="white-space:pre-wrap">@obj.Code</p>
+            </Template>
             <EditTemplate Context="obj">
                 <RadzenTextBox @bind-Value="obj.Code" Style="width:100%; display: block;" />
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ProductType" Property="Name" Title="Name" Frozen="true">
+            <Template Context="obj">
+                <p style="white-space:pre-wrap">@obj.Name</p>
+            </Template>
             <EditTemplate Context="obj">
                 <RadzenTextBox @bind-Value="obj.Name" Style="width:100%; display: block;" />
             </EditTemplate>

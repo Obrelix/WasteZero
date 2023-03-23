@@ -11,7 +11,6 @@ namespace WasteZero.Pages
         ProductType? objToInsert;
         ProductType? objToUpdate;
         RadzenDataGrid<ProductType> grid;
-        private WasteZeroDbContext? _context;
         IEnumerable<ProductType>? productTypes { get; set; }
 
         void Reset() {
@@ -28,8 +27,7 @@ namespace WasteZero.Pages
                 objToInsert = null;
             }
             objToUpdate = null;
-            _context?.Update(obj);
-            _context?.SaveChanges();
+            service.UpdateObj(obj);
         }
 
         async Task SaveRow(ProductType obj) {
@@ -41,11 +39,7 @@ namespace WasteZero.Pages
                 objToInsert = null;
             objToUpdate = null;
             grid.CancelEditRow(obj);
-            var entry = _context?.Entry(obj);
-            if (entry?.State == EntityState.Modified) {
-                entry.CurrentValues.SetValues(entry.OriginalValues);
-                entry.State = EntityState.Unchanged;
-            }
+            service.CancelEdit(obj);
         }
 
         async Task DeleteRow(ProductType obj) {
@@ -54,10 +48,8 @@ namespace WasteZero.Pages
             if (obj == objToInsert) 
                 objToInsert = null;
 
-            if (productTypes.Contains(obj)) {
-                _context?.Remove<ProductType>(obj);
-                _context?.SaveChanges();
-                productTypes = _context?.ProductTypes;
+            if (productTypes != null && productTypes.Contains(obj)) {
+                service.DeleteRow(obj);
                 await grid.Reload();
             } else {
                 grid.CancelEditRow(obj);
@@ -72,16 +64,13 @@ namespace WasteZero.Pages
         }
 
         void OnCreateRow(ProductType obj) {
-            _context?.Add(obj);
-            _context?.SaveChanges();
-            productTypes = _context?.ProductTypes;
+            service.Create(obj);
             objToInsert = null;
         }
 
         protected override async Task OnInitializedAsync() {
             await base.OnInitializedAsync();
-            _context ??= await ProjectDataContextFactory.CreateDbContextAsync();
-            productTypes = _context.ProductTypes;
+            productTypes = service.GetAllObjectsQuerable();
         }
 
     }

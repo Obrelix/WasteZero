@@ -4,14 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using Radzen.Blazor;
 using System;
 using WasteZero.Models;
+using Radzen;
 
 namespace WasteZero.Pages
 {
     public partial class Products {
+        bool? groupsExpanded;
         Product? objToInsert;
         Product? objToUpdate;
         RadzenDataGrid<Product> grid;
-        private WasteZeroDbContext? dbContext;
         IEnumerable<Product>? products { get; set; } 
         IEnumerable<ProductType>? productTypes { get; set; }
 
@@ -28,8 +29,7 @@ namespace WasteZero.Pages
             if (product == objToInsert) 
                 objToInsert = null;
             objToUpdate = null;
-            dbContext?.Update(product);
-            dbContext?.SaveChanges();
+            service.UpdateObj(product);
         }
 
         async Task SaveRow(Product product) {
@@ -41,11 +41,7 @@ namespace WasteZero.Pages
                 objToInsert = null;
             objToUpdate = null;
             grid.CancelEditRow(product);
-            var entry = dbContext?.Entry(product);
-            if (entry?.State == EntityState.Modified) {
-                entry.CurrentValues.SetValues(entry.OriginalValues);
-                entry.State = EntityState.Unchanged;
-            }
+            service.CancelEdit(product);
         }
 
         async Task DeleteRow(Product product) {
@@ -53,9 +49,8 @@ namespace WasteZero.Pages
                 objToInsert = null;
             if (product == objToUpdate) 
                 objToUpdate = null;
-            if (products.Contains(product)) {
-                dbContext?.Remove<Product>(product);
-                dbContext?.SaveChanges();
+            if (products != null && products.Contains(product)) {
+                service.DeleteRow(product);
                 await grid.Reload();
             } else {
                 grid.CancelEditRow(product);
@@ -70,16 +65,25 @@ namespace WasteZero.Pages
         }
 
         void OnCreateRow(Product product) {
-            dbContext?.Add(product);
-            dbContext?.SaveChanges();
+            service.Create(product);
             objToInsert = null;
+        }
+
+        void OnGroupRowRender(GroupRowRenderEventArgs args) {
+            args.Expanded = groupsExpanded;
+        }
+
+        void OnRender(DataGridRenderEventArgs<Product> args) {
+            if (args.FirstRender) {
+                args.Grid.Groups.Add(new GroupDescriptor() { Title = "Expiration Date", Property = "ExpirationDate", SortOrder = SortOrder.Ascending });
+                StateHasChanged();
+            }
         }
 
         protected override async Task OnInitializedAsync() {
             await base.OnInitializedAsync();
-            dbContext ??= await ProjectDataContextFactory.CreateDbContextAsync();
-            products =  dbContext.Products.Include("ProductType");
-            productTypes = dbContext.ProductTypes;
+            products =  service.GetAllObjectsQuerable();
+            productTypes = ptService.GetAllObjectsQuerable();
         }
     }
 }
