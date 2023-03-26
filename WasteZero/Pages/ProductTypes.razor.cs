@@ -10,7 +10,7 @@ namespace WasteZero.Pages
     public partial class ProductTypes {
         ProductType? objToInsert;
         ProductType? objToUpdate;
-        RadzenDataGrid<ProductType> grid;
+        RadzenDataGrid<ProductType>? grid;
         IEnumerable<ProductType>? productTypes { get; set; }
 
         void Reset() {
@@ -19,6 +19,7 @@ namespace WasteZero.Pages
         }
 
         async Task EditRow(ProductType obj) {
+            if (grid == null) return;
             objToUpdate = obj;
             await grid.EditRow(obj);
         }
@@ -31,10 +32,12 @@ namespace WasteZero.Pages
         }
 
         async Task SaveRow(ProductType obj) {
+            if (grid == null) return;
             await grid.UpdateRow(obj);
         }
 
         void CancelEdit(ProductType obj) {
+            if (grid == null) return;
             if (obj == objToInsert) 
                 objToInsert = null;
             objToUpdate = null;
@@ -43,12 +46,14 @@ namespace WasteZero.Pages
         }
 
         async Task DeleteRow(ProductType obj) {
+            if (grid == null) return;
             if (obj == objToInsert) 
                 objToInsert = null;
             if (obj == objToInsert) 
                 objToInsert = null;
 
             if (productTypes != null && productTypes.Contains(obj)) {
+            if (grid == null) return;
                 service.DeleteRow(obj);
                 await grid.Reload();
             } else {
@@ -58,6 +63,7 @@ namespace WasteZero.Pages
         }
 
         async Task InsertRow() {
+            if (grid == null) return;
             objToInsert = new ProductType();
             objToInsert.Id = Guid.NewGuid();
             await grid.InsertRow(objToInsert);

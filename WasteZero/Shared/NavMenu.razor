@@ -7,28 +7,46 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass" @onclick="ToggleIconMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Warehouse
+                <span class="material-icons">warehouse</span>
+                @if (!@IconMenuActive){
+                    <label> &nbsp Warehouse</label>
+                }
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="ProductTypes">
-                <span class="oi oi-plus" aria-hidden="true"></span> Types
+                <span class="material-icons" aria-hidden="true">checklist</span>
+                @if (!@IconMenuActive) {
+                    <label> &nbsp Types</label>
+                }
             </NavLink>
         </div>
     </nav>
 </div>
 
 @code {
+    //bool to send to MainLayout for shrinking sidebar and showing/hide menu text
+    private bool IconMenuActive { get; set; } = false;
+
+    //EventCallback for sending bool to MainLayout
+    [Parameter]
+    public EventCallback<bool> ShowIconMenu { get; set; }
+
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private void ToggleNavMenu()
-    {
+    private void ToggleNavMenu() {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    //Method to toggle IconMenuActive bool and send bool via EventCallback
+    private async Task ToggleIconMenu() {
+        IconMenuActive = false;
+        await ShowIconMenu.InvokeAsync(IconMenuActive);
     }
 }

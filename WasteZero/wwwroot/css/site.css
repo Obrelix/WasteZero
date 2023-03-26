@@ -1,5 +1,5 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
-
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -59,6 +59,17 @@ a, .btn-link {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48
+}
+
+.rz-cell-data {
+    font-size: 5px;
+}
+rz-column-title {
+    font-size: 10px;
+}

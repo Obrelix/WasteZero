@@ -9,17 +9,57 @@
 @inject NavigationManager NavigationManager
 @inject ProductService service
 @inject ProductTypeService ptService
-<PageTitle>Products</PageTitle>
+<PageTitle>Warehouse</PageTitle>
 
-<RadzenButton ButtonStyle="ButtonStyle.Success" class="mt-2 mb-4" Text="Add New Product" Click="@InsertRow" Disabled=@(objToInsert != null || objToUpdate != null) />
-
-<RadzenDataGrid @ref="grid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="15" AllowSorting="true" EditMode="DataGridEditMode.Single" AllowGrouping="true" GroupRowRender="OnGroupRowRender" Render="@OnRender"
-                Data="@products" TItem="Product" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="100px" rowh FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Density="Density.Compact" >
+<RadzenDataGrid @ref="grid" Data="@products" TItem="Product" AllowFiltering="true" AllowPaging="true" PageSize="15" AllowSorting="true" GridLines="DataGridGridLines.Horizontal" EditMode="DataGridEditMode.Single" 
+                RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                RowExpand="RowExpand" RowRender="@RowRender" CellRender="@CellRender" ExpandMode="DataGridExpandMode.Single" >
     <GroupHeaderTemplate>
-        @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Items count: @context.Data.Count, Expiration date: @(context.Data.Items.Cast<Product>().OrderBy(o => o.ExpirationDate).FirstOrDefault()?.ExpirationDate?.Date)
+        @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Items count: @context.Data.Count, Expiration date: @(context.Data.Items.Cast<Product>().OrderBy(o => o.Name).FirstOrDefault()?.Name)
     </GroupHeaderTemplate>
+    <HeaderTemplate>
+        <RadzenButton Icon="add" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@InsertRow" Disabled=@(objToInsert != null || objToUpdate != null) />
+    </HeaderTemplate>
+    <Template Context="obj">
+        <RadzenDataGrid @ref="gridDetail" Data="@obj.Details" TItem="ProductDetail" AllowFiltering="false" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single" Density="Density.Compact"
+                        RowUpdate="@OnUpdateRowDetail" RowCreate="@OnCreateRowDetail" Sort="@ResetDetail" Page="@ResetDetail" Filter="@ResetDetail" RowRender="@RowRenderDetail" CellRender="@CellRenderDetail">
+            <HeaderTemplate>
+                <RadzenButton Icon="add" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => InsertRowDetail(obj.Id))" @onclick:stopPropagation="true" Disabled=@(objToInsertDetail != null || objToUpdateDetail != null) />
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn TItem="ProductDetail" Property="AddedDate" Title="Added" >
+                    <Template Context="obj2">
+                        @String.Format("{0}", obj2.AddedDate?.ToString("dd/MM/yy"))
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductDetail" Property="ExpirationDate" Title="Expiration" >
+                    <Template Context="obj2">
+                        @String.Format("{0}", obj2.ExpirationDate?.ToString("dd/MM/yy"))
+                    </Template>
+                    <EditTemplate Context="obj2">
+                        <RadzenDatePicker @bind-Value="obj2.ExpirationDate" Style="width:100%" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductDetail" Property="Weight" Title="Weight">
+                     <EditTemplate Context="obj2">
+                        <RadzenNumeric @bind-Value="obj2.Weight" Style="width:100%; display: block;" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductDetail" Filterable="false" Sortable="false" TextAlign="TextAlign.Center"  Title="Actions" Frozen="true">
+                    <Template Context="obj2">
+                        <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => EditRowDetail(obj2))" @onclick:stopPropagation="true" />
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Small" class="my-1 ms-1" Click="@(args => DeleteRowDetail(obj2))" @onclick:stopPropagation="true" />
+                    </Template>
+                    <EditTemplate Context="obj2">
+                        <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@((args) => SaveRowDetail(obj2))" />
+                        <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" class="my-1 ms-1" Click="@((args) => CancelEditDetail(obj2))" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </Template>
         <Columns>
-        <RadzenDataGridColumn TItem="Product" Property="Name" Title="Name" Frozen="true" Width="70px">
+        <RadzenDataGridColumn TItem="Product" Property="Name" Title="Name" Width="25%" >
             <Template Context="obj">
                 <p style="white-space:pre-wrap">@obj.Name</p>
             </Template>
@@ -27,7 +67,7 @@
                 <RadzenTextBox @bind-Value="obj.Name" Style=" display: block;" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="ProductTypeID" Title="Type" Frozen="true" Filterable = "false" Width="40px">
+        <RadzenDataGridColumn TItem="Product" Property="ProductTypeID" Title="Type" Filterable="false" Width="15%">
             <Template Context="obj">
                 <p style="white-space:pre-wrap">@obj.ProductType?.Code</p>
             </Template>
@@ -39,53 +79,32 @@
                 </RadzenDropDown>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="IsGlutenFree" Title="Gluten Free" TextAlign="TextAlign.Center" Width="40px">
+        <RadzenDataGridColumn TItem="Product" Property="IsGlutenFree" Title="Gluten Free" TextAlign="TextAlign.Center" Width="10%">
             <Template Context="obj">
                 <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:100%; display: inline-flex;" Disabled="true" />
             </Template>
             <EditTemplate Context="obj">
-                <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:35px; display: inline-flex;" />
+                <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:100%; display: inline-flex;" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="Quantity" Title="Quantity" Width="50px">
-            <EditTemplate Context="obj">
-                <RadzenNumeric @bind-Value="obj.Quantity" Style="width:100%; display: block;" />
-            </EditTemplate>
+        <RadzenDataGridColumn TItem="Product" Property="Quantity" Title="Quantity" Filterable="false" Sortable="false" Width="10%">
+            <Template>
+                <p style="white-space:pre-wrap">@context.Quantity</p>
+            </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="Weight" Title="Weight" Width="50px">
-            <EditTemplate Context="obj">
-                <RadzenNumeric @bind-Value="obj.Weight" Style="width:100%; display: block;" />
-            </EditTemplate>
+        <RadzenDataGridColumn TItem="Product" Property="Weight" Title="Weight" Filterable="false" Sortable="false" Width="15%">
+            <Template>
+                <p style="white-space:pre-wrap">@context.Weight</p>
+            </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="ExpirationDate" Title="Expiration Date" >
+        <RadzenDataGridColumn TItem="Product" Context="product" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Title="Actions" Width="30%">
             <Template Context="obj">
-                <RadzenDatePicker @bind-Value="obj.ExpirationDate" Style="width:100%; display: block;" Disabled="true" />
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => EditRow(obj))" @onclick:stopPropagation="true"/>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Small" class="my-1 ms-1" Click="@(args => DeleteRow(obj))" @onclick:stopPropagation="true"/>
             </Template>
             <EditTemplate Context="obj">
-                <RadzenDatePicker @bind-Value="obj.ExpirationDate" Style="width:100%" />
-            </EditTemplate>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="CreationDate" Title="Creation Date">
-            <Template Context="obj">
-                <RadzenDatePicker @bind-Value="obj.CreationDate" Style="width:100%; display: block;" Disabled="true" />
-            </Template>
-            <EditTemplate Context="obj">
-                <RadzenDatePicker @bind-Value="obj.CreationDate" Style="width:100%" />
-            </EditTemplate>
-        </RadzenDataGridColumn>
-
-        <RadzenDataGridColumn TItem="Product" Context="product" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px" Title="Actions" Frozen="true">
-            <Template Context="obj">
-                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(obj))" @onclick:stopPropagation="true">
-                </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(obj))" @onclick:stopPropagation="true">
-                </RadzenButton>
-            </Template>
-            <EditTemplate Context="obj">
-                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(obj))">
-                </RadzenButton>
-                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(obj))">
-                </RadzenButton>
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@((args) => SaveRow(obj))"/>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" class="my-1 ms-1" Click="@((args) => CancelEdit(obj))"/>
             </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>

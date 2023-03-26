@@ -2,8 +2,8 @@
 
 <PageTitle>WasteZero</PageTitle>
 
-<div class="page">
-    <div class="sidebar">
+<div class="page" style="@IconMenuCssClass">
+    <div style="background-image:none;background-color:cadetblue;" class="sidebar">
         <NavMenu />
     </div>
 
@@ -14,3 +14,11 @@
         </article>
     </main>
 </div>
+@code {
+    private bool _iconMenuActive { get; set; }
+    private string? IconMenuCssClass => _iconMenuActive ? "width: 80px;" : null;
+
+    protected void ToggleIconMenu(bool iconMenuActive) {
+        _iconMenuActive = iconMenuActive;
+    }
+}

@@ -13,6 +13,7 @@ namespace WasteZero.Data
             optionsBuilder.UseSqlite(Configuration.GetConnectionString("ProjectDB"));
         }
         public virtual DbSet<Product> Products { get; set; } = null!;
+        public virtual DbSet<ProductDetail> ProductDetails { get; set; } = null!;
         public virtual DbSet<ProductType> ProductTypes { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<Product>()
@@ -22,6 +23,13 @@ namespace WasteZero.Data
                     .HasColumnName("ID")
                     .HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Name).HasMaxLength(250);
+            });
+            modelBuilder.Entity<ProductDetail>()
+                .ToTable("ProductDetails");
+            modelBuilder.Entity<ProductDetail>(entity => {
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasDefaultValueSql("(newid())");
             });
             modelBuilder.Entity<ProductType>()
                 .ToTable("ProductTypes");
@@ -52,7 +60,8 @@ namespace WasteZero.Data
                 new ProductType { Id = Guid.NewGuid(), Code = "ΚΡ", Name = "Κρέας" },
                 new ProductType { Id = Guid.NewGuid(), Code = "ΜΛ", Name = "Μέλι" },
                 new ProductType { Id = Guid.NewGuid(), Code = "ΦΡ", Name = "Φρυγανιές" },
-                new ProductType { Id = Guid.NewGuid(), Code = "ΨΜ", Name = "Ψωμί" });
+                new ProductType { Id = Guid.NewGuid(), Code = "ΨΜ", Name = "Ψωμί" }
+            );
             //modelBuilder.Entity<Product>()
             //.HasData(
             //    new Product { Id = Guid.NewGuid(), Name = "Μακαρόνια", IsGlutenFree = true, Quantity = 1.5f, Weight = 2.5f, ExpirationDate = DateTime.Now.AddDays(35), CreationDate = DateTime.Now },

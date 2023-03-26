@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\Obrelix\Desktop\WasteZero</_PublishTargetUrl>
+    <History>True|2023-03-26T00:59:05.1056797Z;True|2023-03-26T02:57:55.4632669+02:00;True|2023-03-26T02:45:44.8980346+02:00;True|2023-03-25T23:50:07.3022509+02:00;True|2023-03-25T23:29:33.8999644+02:00;True|2023-03-25T23:12:14.4600934+02:00;True|2023-03-25T20:49:13.8381087+02:00;True|2023-03-25T19:47:47.6353171+02:00;False|2023-03-25T19:47:29.6833479+02:00;False|2023-03-25T19:45:30.6298092+02:00;True|2023-03-25T19:43:07.2112381+02:00;</History>
+    <LastFailureDetails />
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="ProjectDB">
+      <Value>Data Source=Data\Data.db</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>
