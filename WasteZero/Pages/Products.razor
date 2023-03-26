@@ -59,7 +59,7 @@
         </RadzenDataGrid>
     </Template>
         <Columns>
-        <RadzenDataGridColumn TItem="Product" Property="Name" Title="Name" Width="25%" >
+        <RadzenDataGridColumn TItem="Product" Property="Name" Title="Name" Width="25%" MinWidth="45px">
             <Template Context="obj">
                 <p style="white-space:pre-wrap">@obj.Name</p>
             </Template>
@@ -67,19 +67,19 @@
                 <RadzenTextBox @bind-Value="obj.Name" Style=" display: block;" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="ProductTypeID" Title="Type" Filterable="false" Width="15%">
+        <RadzenDataGridColumn TItem="Product" Property="ProductTypeID" Title="Type" Filterable="false" Width="15%" MinWidth="42px">
             <Template Context="obj">
                 <p style="white-space:pre-wrap">@obj.ProductType?.Code</p>
             </Template>
             <EditTemplate Context="obj">
-                <RadzenDropDown @bind-Value="obj.ProductTypeID" Data="@productTypes" ValueProperty="Id" Style="width:100%; display: block;">
+                <RadzenDropDown @bind-Value="obj.ProductTypeID" Data="@productTypes" ValueProperty="Id" Style="width:500%; display: block;">
                     <Template>
                         <p style="white-space:pre-wrap">@context.Name</p>
                     </Template>
                 </RadzenDropDown>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="IsGlutenFree" Title="Gluten Free" TextAlign="TextAlign.Center" Width="10%">
+        <RadzenDataGridColumn TItem="Product" Property="IsGlutenFree" Title="GF" TextAlign="TextAlign.Center" Width="10%" MinWidth="34px">
             <Template Context="obj">
                 <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:100%; display: inline-flex;" Disabled="true" />
             </Template>
@@ -87,12 +87,12 @@
                 <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:100%; display: inline-flex;" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="Quantity" Title="Quantity" Filterable="false" Sortable="false" Width="10%">
+        <RadzenDataGridColumn TItem="Product" Property="Quantity" Title="Quantity" Filterable="false" Sortable="false" Width="15%">
             <Template>
                 <p style="white-space:pre-wrap">@context.Quantity</p>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="Weight" Title="Weight" Filterable="false" Sortable="false" Width="15%">
+        <RadzenDataGridColumn TItem="Product" Property="Weight" Title="Weight" Filterable="false" Sortable="false" Width="10%" MinWidth="60wpx">
             <Template>
                 <p style="white-space:pre-wrap">@context.Weight</p>
             </Template>

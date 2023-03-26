@@ -29,6 +29,9 @@ namespace WasteZero.Services {
         }
         public void DeleteRow(Product obj) {
             if (obj != null) {
+                if(obj.Details != null) 
+                    foreach (ProductDetail detail in obj.Details)
+                        dbContext?.Remove<ProductDetail>(detail);
                 dbContext?.Remove<Product>(obj);
                 dbContext?.SaveChanges();
             }
@@ -45,7 +48,6 @@ namespace WasteZero.Services {
                 dbContext?.SaveChanges();
             }
         }
-
         public void CancelEditDetail(ProductDetail obj) {
             var entry = dbContext?.Entry(obj);
             if (entry?.State == EntityState.Modified) {
