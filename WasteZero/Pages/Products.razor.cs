@@ -6,8 +6,7 @@ using System;
 using WasteZero.Models;
 using Radzen;
 
-namespace WasteZero.Pages
-{
+namespace WasteZero.Pages {
     public partial class Products {
         Product? objToInsert;
         Product? objToUpdate;
@@ -16,7 +15,6 @@ namespace WasteZero.Pages
         RadzenDataGrid<Product>? grid;
         RadzenDataGrid<ProductDetail>? gridDetail;
         IEnumerable<Product>? products { get; set; }
-        IEnumerable<ProductDetail>? details { get; set; }
         IEnumerable<ProductType>? productTypes { get; set; }
 
         void Reset() {
@@ -31,7 +29,7 @@ namespace WasteZero.Pages
         }
 
         void OnUpdateRow(Product product) {
-            if (product == objToInsert) 
+            if (product == objToInsert)
                 objToInsert = null;
             objToUpdate = null;
             service.UpdateObj(product);
@@ -44,7 +42,7 @@ namespace WasteZero.Pages
 
         void CancelEdit(Product product) {
             if (grid == null) return;
-            if (product == objToInsert) 
+            if (product == objToInsert)
                 objToInsert = null;
             objToUpdate = null;
             grid.CancelEditRow(product);
@@ -53,8 +51,8 @@ namespace WasteZero.Pages
 
         async Task DeleteRow(Product product) {
             if (grid == null) return;
-            //var confirmationResult = await this.DialogService.Confirm("Are you sure?", "Delete Row", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
-            //if (confirmationResult == true) {
+            var confirmationResult = await this.DialogService.Confirm("Are you sure?", "Delete Row", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+            if (confirmationResult.HasValue && confirmationResult.Value) {
                 if (product == objToInsert)
                     objToInsert = null;
                 if (product == objToUpdate)
@@ -66,7 +64,7 @@ namespace WasteZero.Pages
                     grid.CancelEditRow(product);
                     await grid.Reload();
                 }
-            //}
+            }
         }
 
         async Task InsertRow() {
@@ -79,6 +77,7 @@ namespace WasteZero.Pages
         void OnCreateRow(Product product) {
             service.Create(product);
             products = service.GetAllObjectsQuerable();
+            products = products?.OrderBy(x => x.MinDetailExpDate).ThenBy(x => x.Name).AsQueryable();
             objToInsert = null;
         }
 
@@ -90,6 +89,7 @@ namespace WasteZero.Pages
             if (args.FirstRender) {
                 //args.Grid.Groups.Add(new GroupDescriptor() { Title = "Expiration Date", Property = "ExpirationDate", SortOrder = SortOrder.Ascending });
                 //StateHasChanged();
+
             }
         }
 
@@ -99,15 +99,12 @@ namespace WasteZero.Pages
         }
 
         void CellRender(DataGridCellRenderEventArgs<Product> args) {
-            if (args.Column.Property != "Name") 
-                return; 
+            if (args.Column.Property != "Name")
+                return;
             ExprirationStatus? status = args.Data.Status;
             switch (status) {
                 case ExprirationStatus.noDetails:
                     args.Attributes.Add("style", $"background-color: var(--rz-base-500)");
-                    break;
-                case ExprirationStatus.ok:
-                    args.Attributes.Add("style", $"background-color: var(--rz-base-background-color)");
                     break;
                 case ExprirationStatus.soon:
                     args.Attributes.Add("style", $"background-color: var(--rz-warning-lighter)");
@@ -118,8 +115,8 @@ namespace WasteZero.Pages
                 case ExprirationStatus.expired:
                     args.Attributes.Add("style", $"background-color: var(--rz-danger-light)");
                     break;
+                case ExprirationStatus.ok:
                 default:
-                    args.Attributes.Add("style", $"background-color: var(--rz-base-background-color)");
                     break;
             }
         }
@@ -137,9 +134,6 @@ namespace WasteZero.Pages
                 case ExprirationStatus.noDetails:
                     args.Attributes.Add("style", $"background-color: var(--rz-base-500)");
                     break;
-                case ExprirationStatus.ok:
-                    args.Attributes.Add("style", $"background-color: var(--rz-base-background-color)");
-                    break;
                 case ExprirationStatus.soon:
                     args.Attributes.Add("style", $"background-color: var(--rz-warning-lighter)");
                     break;
@@ -149,8 +143,8 @@ namespace WasteZero.Pages
                 case ExprirationStatus.expired:
                     args.Attributes.Add("style", $"background-color: var(--rz-danger-light)");
                     break;
+                case ExprirationStatus.ok:
                 default:
-                    args.Attributes.Add("style", $"background-color: var(--rz-base-background-color)");
                     break;
             }
         }
@@ -195,22 +189,21 @@ namespace WasteZero.Pages
 
         async Task DeleteRowDetail(ProductDetail detail) {
             if (gridDetail == null) return;
-            //var confirmationResult = await this.DialogService.Confirm("Are you sure?", "Delete Row", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
-       //     var confirmResult = await DialogService.Confirm(
-       //"Foo", "Bar");
-       //     if (confirmResult.HasValue && confirmResult.Value) {
+            var confirmationResult = await this.DialogService.Confirm("Are you sure?", "Delete Row", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+            if (confirmationResult.HasValue && confirmationResult.Value) {
                 if (detail == objToInsertDetail)
                     objToInsertDetail = null;
                 if (detail == objToUpdateDetail)
                     objToUpdateDetail = null;
-                if (details != null && details.Contains(detail)) {
+                Product? obj = products?.Where(x => x.Id.Equals(detail.ProductID)).FirstOrDefault();
+                if (obj != null && obj.Details != null && obj.Details.Any(x => x.Id.Equals(detail.Id))) {
                     service.DeleteRowDetail(detail);
                     await gridDetail.Reload();
                 } else {
                     gridDetail.CancelEditRow(detail);
                     await gridDetail.Reload();
                 }
-            //}
+            }
         }
 
         async Task InsertRowDetail(Guid parentID) {
@@ -229,7 +222,8 @@ namespace WasteZero.Pages
 
         protected override async Task OnInitializedAsync() {
             await base.OnInitializedAsync();
-            products =  service.GetAllObjectsQuerable();
+            products = service.GetAllObjectsQuerable();
+            products = products?.OrderBy(x => x.MinDetailExpDate).ThenBy(x => x.Name).AsQueryable();
             productTypes = ptService.GetAllObjectsQuerable();
         }
     }

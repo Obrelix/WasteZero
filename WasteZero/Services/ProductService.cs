@@ -10,11 +10,14 @@ namespace WasteZero.Services {
             dbContext = context;
         }
         public IQueryable<Product>? GetAllObjectsQuerable() {
-            IQueryable<Product>? result = dbContext?.Products?.Include("ProductType").Include("Details").OrderBy(x => x.Name).AsQueryable();
+            IQueryable<Product>? result = dbContext?.Products?
+            .Include("ProductType")
+            .Include("Details")
+            .AsQueryable();
             return result;
         }
-        public IQueryable<ProductDetail>? GetAllDetailsQuerable(Guid parentID ) {
-            IQueryable<ProductDetail>? result = dbContext?.ProductDetails?.Where(x=>x.ProductID.Equals(parentID)).OrderBy(x => x.ExpirationDate).AsQueryable();
+        public IQueryable<ProductDetail>? GetAllDetailsQuerable(Guid parentID) {
+            IQueryable<ProductDetail>? result = dbContext?.ProductDetails?.Where(x => x.ProductID.Equals(parentID)).OrderBy(x => x.ExpirationDate).AsQueryable();
             return result;
         }
         public void CancelEdit(Product obj) {

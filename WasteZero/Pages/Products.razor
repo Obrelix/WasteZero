@@ -11,7 +11,6 @@
 @inject ProductTypeService ptService
 @inject DialogService DialogService
 <PageTitle>Warehouse</PageTitle>
-
 <RadzenDataGrid @ref="grid" Data="@products" TItem="Product" AllowFiltering="true" AllowPaging="true" PageSize="15" AllowSorting="true" GridLines="DataGridGridLines.Horizontal" EditMode="DataGridEditMode.Single" 
                 RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
                 RowExpand="RowExpand" RowRender="@RowRender" CellRender="@CellRender" ExpandMode="DataGridExpandMode.Single" >
@@ -33,7 +32,7 @@
                         @String.Format("{0}", obj2.AddedDate?.ToString("dd/MM/yy"))
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="ProductDetail" Property="ExpirationDate" Title="Expiration" >
+                <RadzenDataGridColumn TItem="ProductDetail" Property="ExpirationDate" Title="Expiration" Sortable ="true" SortOrder="SortOrder.Ascending" >
                     <Template Context="obj2">
                         @String.Format("{0}", obj2.ExpirationDate?.ToString("dd/MM/yy"))
                     </Template>
@@ -49,7 +48,7 @@
                 <RadzenDataGridColumn TItem="ProductDetail" Filterable="false" Sortable="false" TextAlign="TextAlign.Center"  Title="Actions" Frozen="true">
                     <Template Context="obj2">
                         <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => EditRowDetail(obj2))" @onclick:stopPropagation="true" />
-                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Small" class="my-1 ms-1" Click="@(args => DeleteRowDetail(obj2))" @onclick:stopPropagation="true" />
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Small" class="my-1 ms-1" Click="@(async () => await DeleteRowDetail(obj2))" @onclick:stopPropagation="true" />
                     </Template>
                     <EditTemplate Context="obj2">
                         <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@((args) => SaveRowDetail(obj2))" />
@@ -110,3 +109,4 @@
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+

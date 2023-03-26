@@ -25,12 +25,16 @@ namespace WasteZero.Models
             }
         }
         [NotMapped] 
-        public float? Weight {
+        public float Weight {
             get {
                 if(this.Details == null) 
                     return 0.0f;
-                else
-                    return this.Details?.Select(x => x.Weight).Sum();
+                else {
+                    float? sum = this.Details?.Select(x => x.Weight).Sum();
+                    if (sum != null && sum.HasValue)
+                        return (float)Math.Round(sum.Value,3);
+                    else return 0.0f;
+                }
             }
         }
         [NotMapped]
@@ -52,6 +56,19 @@ namespace WasteZero.Models
                 return ExprirationStatus.ok;
             }
         }
+
+        [NotMapped]
+        public DateTime MinDetailExpDate { get {
+                if (Details!= null && Details.Any()) {
+                    DateTime? min = Details.Select(x => x.ExpirationDate).Min();
+                    if (min == null || !min.HasValue)
+                        return DateTime.MaxValue;
+                    else
+                        return min.Value;
+                }
+                else
+                    return DateTime.MaxValue;
+            } }
     }
     public enum ExprirationStatus {
         noDetails,
