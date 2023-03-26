@@ -9,6 +9,7 @@
 @inject NavigationManager NavigationManager
 @inject ProductService service
 @inject ProductTypeService ptService
+@inject DialogService DialogService
 <PageTitle>Warehouse</PageTitle>
 
 <RadzenDataGrid @ref="grid" Data="@products" TItem="Product" AllowFiltering="true" AllowPaging="true" PageSize="15" AllowSorting="true" GridLines="DataGridGridLines.Horizontal" EditMode="DataGridEditMode.Single" 
