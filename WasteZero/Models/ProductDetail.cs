@@ -13,7 +13,6 @@ namespace WasteZero.Models {
         public DateTime? ExpirationDate { get; set; }
         public DateTime? AddedDate { get; set; }
         public float? Weight { get; set; }
-
         [NotMapped]
         public ExprirationStatus? Status {
             get {

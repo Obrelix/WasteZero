@@ -16,7 +16,8 @@ namespace WasteZero.Pages {
         RadzenDataGrid<ProductDetail>? gridDetail;
         IEnumerable<Product>? products { get; set; }
         IEnumerable<ProductType>? productTypes { get; set; }
-
+        public bool EditEnabled { get; set; } = false;
+        public bool EditDetailEnabled { get; set; } = false;
         void Reset() {
             objToInsert = null;
             objToUpdate = null;
@@ -51,7 +52,7 @@ namespace WasteZero.Pages {
 
         async Task DeleteRow(Product product) {
             if (grid == null) return;
-            var confirmationResult = await this.DialogService.Confirm("Are you sure?", "Delete Row", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+            var confirmationResult = await this.DialogService.Confirm("Are you sure ?", "Delete Row Permanently ", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
             if (confirmationResult.HasValue && confirmationResult.Value) {
                 if (product == objToInsert)
                     objToInsert = null;
@@ -71,6 +72,7 @@ namespace WasteZero.Pages {
             if (grid == null) return;
             objToInsert = new Product();
             objToInsert.Id = Guid.NewGuid();
+            EditEnabled = true;
             await grid.InsertRow(objToInsert);
         }
 
@@ -187,17 +189,21 @@ namespace WasteZero.Pages {
             service.CancelEditDetail(detail);
         }
 
-        async Task DeleteRowDetail(ProductDetail detail) {
+        async Task DeleteRowDetail(ProductDetail detail, bool consume) {
             if (gridDetail == null) return;
-            var confirmationResult = await this.DialogService.Confirm("Are you sure?", "Delete Row", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+            string title = consume ? "Consume Product" : "Delete Row";
+            var confirmationResult = await this.DialogService.Confirm("Are you sure?", title, new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
             if (confirmationResult.HasValue && confirmationResult.Value) {
                 if (detail == objToInsertDetail)
                     objToInsertDetail = null;
                 if (detail == objToUpdateDetail)
                     objToUpdateDetail = null;
                 Product? obj = products?.Where(x => x.Id.Equals(detail.ProductID)).FirstOrDefault();
-                if (obj != null && obj.Details != null && obj.Details.Any(x => x.Id.Equals(detail.Id))) {
-                    service.DeleteRowDetail(detail);
+                if (obj != null && obj.Details != null && obj.Details.Any(x => x.Id.Equals(detail.Id))) { 
+                    if(!consume)
+                        service.DeleteRowDetail(detail);
+                    else
+                        service.ConsumeRowDetail(detail);
                     await gridDetail.Reload();
                 } else {
                     gridDetail.CancelEditRow(detail);
@@ -205,16 +211,21 @@ namespace WasteZero.Pages {
                 }
             }
         }
-
         async Task InsertRowDetail(Guid parentID) {
             if (gridDetail == null) return;
             objToInsertDetail = new ProductDetail();
             objToInsertDetail.Id = Guid.NewGuid();
             objToInsertDetail.ProductID = parentID;
             objToInsertDetail.AddedDate = DateTime.Now;
+            EditDetailEnabled = true;
             await gridDetail.InsertRow(objToInsertDetail);
         }
-
+        void ChangeEditStatus() {
+            EditEnabled = !EditEnabled;
+        }
+        void ChangeEditDetailStatus() {
+            EditDetailEnabled = !EditDetailEnabled;
+        }
         void OnCreateRowDetail(ProductDetail detail) {
             service.CreateDetail(detail);
             objToInsertDetail = null;

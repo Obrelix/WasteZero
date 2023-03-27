@@ -13,18 +13,20 @@
 <PageTitle>Warehouse</PageTitle>
 <RadzenDataGrid @ref="grid" Data="@products" TItem="Product" AllowFiltering="true" AllowPaging="true" PageSize="15" AllowSorting="true" GridLines="DataGridGridLines.Horizontal" EditMode="DataGridEditMode.Single" 
                 RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-                RowExpand="RowExpand" RowRender="@RowRender" CellRender="@CellRender" ExpandMode="DataGridExpandMode.Single" >
+                RowExpand="RowExpand" RowRender="@RowRender" CellRender="@CellRender" ExpandMode="DataGridExpandMode.Single" Density="Density.Compact">
     <GroupHeaderTemplate>
         @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Items count: @context.Data.Count, Expiration date: @(context.Data.Items.Cast<Product>().OrderBy(o => o.Name).FirstOrDefault()?.Name)
     </GroupHeaderTemplate>
     <HeaderTemplate>
         <RadzenButton Icon="add" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@InsertRow" Disabled=@(objToInsert != null || objToUpdate != null) />
+        <RadzenButton Icon="build" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@ChangeEditStatus" Disabled=@(objToInsertDetail != null || objToUpdateDetail != null) />
     </HeaderTemplate>
     <Template Context="obj">
         <RadzenDataGrid @ref="gridDetail" Data="@obj.Details" TItem="ProductDetail" AllowFiltering="false" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single" Density="Density.Compact"
-                        RowUpdate="@OnUpdateRowDetail" RowCreate="@OnCreateRowDetail" Sort="@ResetDetail" Page="@ResetDetail" Filter="@ResetDetail" RowRender="@RowRenderDetail" CellRender="@CellRenderDetail">
+                       RowUpdate="@OnUpdateRowDetail" RowCreate="@OnCreateRowDetail" Sort="@ResetDetail" Page="@ResetDetail" Filter="@ResetDetail" RowRender="@RowRenderDetail" CellRender="@CellRenderDetail">
             <HeaderTemplate>
                 <RadzenButton Icon="add" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => InsertRowDetail(obj.Id))" @onclick:stopPropagation="true" Disabled=@(objToInsertDetail != null || objToUpdateDetail != null) />
+                <RadzenButton Icon="build" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@ChangeEditDetailStatus" @onclick:stopPropagation="true" Disabled=@(objToInsertDetail != null || objToUpdateDetail != null) />
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn TItem="ProductDetail" Property="AddedDate" Title="Added" >
@@ -45,10 +47,11 @@
                         <RadzenNumeric @bind-Value="obj2.Weight" Style="width:100%; display: block;" />
                     </EditTemplate>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="ProductDetail" Filterable="false" Sortable="false" TextAlign="TextAlign.Center"  Title="Actions" Frozen="true">
+                <RadzenDataGridColumn TItem="ProductDetail" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Title="Actions" Visible=@(EditDetailEnabled) MinWidth="150px">
                     <Template Context="obj2">
-                        <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => EditRowDetail(obj2))" @onclick:stopPropagation="true" />
-                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Small" class="my-1 ms-1" Click="@(async () => await DeleteRowDetail(obj2))" @onclick:stopPropagation="true" />
+                        <RadzenButton Icon="build" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => EditRowDetail(obj2))" @onclick:stopPropagation="true" />
+                        <RadzenButton Icon="restaurant" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(async () => await DeleteRowDetail(obj2, true))" @onclick:stopPropagation="true" />
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat"  Size="ButtonSize.Small" Click="@(async () => await DeleteRowDetail(obj2, false))" @onclick:stopPropagation="true" />
                     </Template>
                     <EditTemplate Context="obj2">
                         <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@((args) => SaveRowDetail(obj2))" />
@@ -92,14 +95,14 @@
                 <p style="white-space:pre-wrap">@context.Quantity</p>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="Weight" Title="Weight" Filterable="false" Sortable="false" Width="10%" MinWidth="60wpx">
+        <RadzenDataGridColumn TItem="Product" Property="Weight" Title="Weight" Filterable="false" Sortable="false" Width="10%" MinWidth="60px">
             <Template>
                 <p style="white-space:pre-wrap">@context.Weight</p>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Context="product" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Title="Actions" Width="30%">
+        <RadzenDataGridColumn TItem="Product" Context="product" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Title="Actions" Width="30%" Visible=@(EditEnabled)>
             <Template Context="obj">
-                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => EditRow(obj))" @onclick:stopPropagation="true"/>
+                <RadzenButton Icon="build" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@(args => EditRow(obj))" @onclick:stopPropagation="true" />
                 <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Small" class="my-1 ms-1" Click="@(args => DeleteRow(obj))" @onclick:stopPropagation="true"/>
             </Template>
             <EditTemplate Context="obj">

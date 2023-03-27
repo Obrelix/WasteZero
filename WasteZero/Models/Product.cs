@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace WasteZero.Models
 {
     [Table("Products")]
-    public class Product
-    {
+    public class Product {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
@@ -15,6 +14,7 @@ namespace WasteZero.Models
         public Guid? ProductTypeID { get; set; }
         public ProductType? ProductType { get; set; }
         public IEnumerable<ProductDetail>? Details { get; set; }
+        public IEnumerable<ConsumedDetail>? ConsumedDetails { get; set; }
         [NotMapped]
         public int? Quantity {
             get {

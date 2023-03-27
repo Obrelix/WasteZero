@@ -11,8 +11,9 @@ namespace WasteZero.Services {
         }
         public IQueryable<Product>? GetAllObjectsQuerable() {
             IQueryable<Product>? result = dbContext?.Products?
-            .Include("ProductType")
-            .Include("Details")
+            .Include(x=>x.ProductType)
+            .Include(x => x.Details)
+            .Include(x=>x.ConsumedDetails)
             .AsQueryable();
             return result;
         }
@@ -30,8 +31,11 @@ namespace WasteZero.Services {
         public void DeleteRow(Product obj) {
             if (obj != null) {
                 if(obj.Details != null) 
-                    foreach (ProductDetail detail in obj.Details)
+                    foreach (ProductDetail detail in obj.Details) 
                         dbContext?.Remove<ProductDetail>(detail);
+                if (obj.ConsumedDetails != null)
+                    foreach (ConsumedDetail cd in obj.ConsumedDetails)
+                        dbContext?.Remove<ConsumedDetail>(cd);
                 dbContext?.Remove<Product>(obj);
                 dbContext?.SaveChanges();
             }
@@ -57,6 +61,20 @@ namespace WasteZero.Services {
         }
         public void DeleteRowDetail(ProductDetail obj) {
             if (obj != null) {
+                dbContext?.Remove<ProductDetail>(obj);
+                dbContext?.SaveChanges();
+            }
+        }
+        public void ConsumeRowDetail(ProductDetail obj) {
+            if (obj != null) {
+                ConsumedDetail cd = new ConsumedDetail() {
+                    Id = Guid.NewGuid(),
+                    AddedDate = DateTime.Now,
+                    ProductID = obj.ProductID,
+                    ExpirationDate = obj.ExpirationDate,
+                    Weight = obj.Weight,
+                };
+                dbContext?.Add<ConsumedDetail>(cd);
                 dbContext?.Remove<ProductDetail>(obj);
                 dbContext?.SaveChanges();
             }

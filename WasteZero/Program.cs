@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using WasteZero.Services;
 using Radzen;
+using System.Net;
 //using System.Net;
 
 
 var builder = WebApplication.CreateBuilder(args); 
-var connectionString = builder.Configuration.GetConnectionString("ProjectDB"); 
-//IPAddress[] addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-//IPAddress localIp = addresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+var connectionString = builder.Configuration.GetConnectionString("ProjectDB");
+IPAddress[] addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+IPAddress? localIp = addresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
