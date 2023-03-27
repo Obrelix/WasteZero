@@ -8,13 +8,8 @@ using Radzen;
 //using System.Net;
 
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); 
 var connectionString = builder.Configuration.GetConnectionString("ProjectDB"); 
-builder.WebHost.ConfigureKestrel(serverOptions => {
-    serverOptions.ConfigureHttpsDefaults(listenOptions => {
-
-    });
-});
 //IPAddress[] addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
 //IPAddress localIp = addresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
 // Add services to the container.
