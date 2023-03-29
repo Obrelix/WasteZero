@@ -70,6 +70,23 @@ a, .btn-link {
 .rz-cell-data {
     font-size: 5px;
 }
-rz-column-title {
+.rz-column-title {
     font-size: 10px;
+}
+.rz-custom-header {
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 10px;
+    margin-left: auto;
+}
+.rz-cell-data {
+    display: flex;
+    flex-wrap: wrap;
+}
+.actionColContent {
+    display: flex;
+    column-gap: 5px;
+    justify-content: center;
+    row-gap: 5px;
+    flex-wrap: wrap;
 }
