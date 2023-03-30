@@ -1,0 +1,56 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using Radzen.Blazor
+@using Radzen;
+@using WasteZero.Data
+@using WasteZero.Models
+@using WasteZero.Services
+@page "/Dashboard"
+@inject ChartService service
+<PageTitle>Dashboard</PageTitle>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 my-5">
+            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
+
+                @*<RadzenDropDown @bind-Value="Name" Data="@consItems" ValueProperty="Name" Style="width:500%; display: block;">
+                    <Template>
+                        <p style="white-space:pre-wrap">@context.Name</p>
+                    </Template>
+                </RadzenDropDown>*@
+            </RadzenCard>
+            @{
+                foreach (ChartData data in consItems) {
+                    if (data != null && data.Data !=null && data.Data.Any()) {
+                        string? name = data.Name;
+                        List<CosnumptionModel> models = data.Data;
+                        <RadzenChart >
+                            <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" Title="Weight" LineType="LineType.Dashed" ValueProperty="Weight">
+                                <RadzenMarkers MarkerType="MarkerType.Circle" />
+                                <RadzenSeriesDataLabels Visible="true" />
+                            </RadzenLineSeries>
+                            <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" Title="Stock" LineType="LineType.Dotted" ValueProperty="StockCount">
+                                <RadzenMarkers MarkerType="MarkerType.Square" />
+                                <RadzenSeriesDataLabels Visible="true" />
+                            </RadzenLineSeries>
+                            <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" Title="In" LineType="LineType.Dashed" ValueProperty="AddedCount">
+                                <RadzenMarkers MarkerType="MarkerType.Triangle" />
+                                <RadzenSeriesDataLabels Visible="true" />
+                            </RadzenLineSeries>
+                            <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" Title="Out" LineType="LineType.Dotted" ValueProperty="ConsumedCount">
+                                <RadzenMarkers MarkerType="MarkerType.Triangle" />
+                                <RadzenSeriesDataLabels Visible="true" />
+                            </RadzenLineSeries>
+                            <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" >
+                            </RadzenCategoryAxis>
+                            <RadzenValueAxis Formatter="@FormatAsNumeric">
+                                <RadzenGridLines Visible="true" />
+                                <RadzenAxisTitle Text="@name" />
+                            </RadzenValueAxis>
+                        </RadzenChart>
+                        }
+                    }
+
+                }
+        </div>
+    </div>
+</div>

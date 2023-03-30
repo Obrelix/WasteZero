@@ -1,5 +1,4 @@
-﻿
-using WasteZero.Data;
+﻿using WasteZero.Data;
 using Microsoft.EntityFrameworkCore;
 using Radzen.Blazor;
 using System;
@@ -19,9 +18,8 @@ namespace WasteZero.Pages
         }
 
         async Task EditRow(ProductType obj) {
-            if (grid == null) return;
             objToUpdate = obj;
-            await grid.EditRow(obj);
+            await grid!.EditRow(obj);
         }
         void OnUpdateRow(ProductType obj) {
             if (obj == objToInsert) {
@@ -32,21 +30,18 @@ namespace WasteZero.Pages
         }
 
         async Task SaveRow(ProductType obj) {
-            if (grid == null) return;
-            await grid.UpdateRow(obj);
+            await grid!.UpdateRow(obj);
         }
 
         void CancelEdit(ProductType obj) {
-            if (grid == null) return;
             if (obj == objToInsert) 
                 objToInsert = null;
             objToUpdate = null;
-            grid.CancelEditRow(obj);
+            grid!.CancelEditRow(obj);
             service.CancelEdit(obj);
         }
 
         async Task DeleteRow(ProductType obj) {
-            if (grid == null) return;
             if (obj == objToInsert) 
                 objToInsert = null;
             if (obj == objToInsert) 
@@ -57,16 +52,15 @@ namespace WasteZero.Pages
                 service.DeleteRow(obj);
                 await grid.Reload();
             } else {
-                grid.CancelEditRow(obj);
+                grid!.CancelEditRow(obj);
                 await grid.Reload();
             }
         }
 
         async Task InsertRow() {
-            if (grid == null) return;
             objToInsert = new ProductType();
             objToInsert.Id = Guid.NewGuid();
-            await grid.InsertRow(objToInsert);
+            await grid!.InsertRow(objToInsert);
         }
 
         void OnCreateRow(ProductType obj) {

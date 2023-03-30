@@ -25,6 +25,7 @@ builder.Services.AddDbContext<WasteZeroDbContext>(options => options.UseSqlite(c
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<ProductTypeService>();
+builder.Services.AddScoped<ChartService>();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment()) {
