@@ -4,53 +4,137 @@
 @using WasteZero.Data
 @using WasteZero.Models
 @using WasteZero.Services
-@page "/Dashboard"
+@page "/"
 @inject ChartService service
+@inject ProductService pservice
+@inject ProductTypeService ptService
 <PageTitle>Dashboard</PageTitle>
 <div class="container">
     <div class="row">
         <div class="col-sm-12 my-5">
+            <h4>Expired Items</h4>
+            <RadzenDataGrid @ref="grid" Data="@expiredProducts" TItem="Product" AllowPaging="true" PageSize="5" AllowSorting="true" GridLines="DataGridGridLines.Horizontal"
+                            RowExpand="RowExpand" RowRender="@RowRender" CellRender="@CellRender" ExpandMode="DataGridExpandMode.Single" Density="Density.Compact">
+                <Template Context="obj">
+                    <RadzenDataGrid @ref="gridDetail" Data="@obj.ExpiredDetails" TItem="ProductDetail" AllowFiltering="false" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single" Density="Density.Compact"
+                                    RowRender="@RowRenderDetail" CellRender="@CellRenderDetail">
+                        <Columns>
+                            <RadzenDataGridColumn TItem="ProductDetail" Property="AddedDate" Title="Added">
+                                <Template Context="obj2">
+                                    @String.Format("{0}", obj2.AddedDate?.ToString("dd/MM/yy"))
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="ProductDetail" Property="ExpirationDate" Title="Expiration" Sortable="true" SortOrder="SortOrder.Ascending">
+                                <Template Context="obj2">
+                                    @String.Format("{0}", obj2.ExpirationDate?.ToString("dd/MM/yy"))
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="ProductDetail" Property="Weight" Title="Weight"></RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                </Template>
+                <Columns>
+                    <RadzenDataGridColumn TItem="Product" Property="Name" Title="Name" Width="35%" MinWidth="45px">
+                        <Template Context="obj">
+                            <p style="white-space:pre-wrap">@obj.Name</p>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Product" Property="ProductTypeID" Title="Type" Filterable="false" Width="25%" MinWidth="42px">
+                        <Template Context="obj">
+                            <p style="white-space:pre-wrap">@obj.ProductType?.Name</p>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Product" Property="IsGlutenFree" Title="GF" TextAlign="TextAlign.Center" Width="10%" MinWidth="40px">
+                        <Template Context="obj">
+                            <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:30px; display: inline-flex;" Disabled="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Product" Property="ExpiredQuantity" Title="Quantity" Filterable="false" Sortable="false" Width="15%">
+                        <Template>
+                            <p style="white-space:pre-wrap">@context.Quantity</p>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Product" Property="Weight" Title="ExpiredWeight" Filterable="false" Sortable="false" Width="15%" MinWidth="60px">
+                        <Template>
+                            <p style="white-space:pre-wrap">@string.Format("{0} kg",context.Weight)</p>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem"></RadzenCard>
             <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
-
-                @*<RadzenDropDown @bind-Value="Name" Data="@consItems" ValueProperty="Name" Style="width:500%; display: block;">
+                <h4>Consumption Charts</h4>
+                <RadzenDropDown @bind-Value="@productIDs" Data="@consItems" Change="@ChangeData" TextProperty="Name" ValueProperty="ProductID" Multiple=true AllowClear=true Placeholder="Select products" Style="width: 100%; max-width: 400px;">
                     <Template>
                         <p style="white-space:pre-wrap">@context.Name</p>
                     </Template>
-                </RadzenDropDown>*@
+                </RadzenDropDown>
             </RadzenCard>
             @{
-                foreach (ChartData data in consItems) {
-                    if (data != null && data.Data !=null && data.Data.Any()) {
-                        string? name = data.Name;
-                        List<CosnumptionModel> models = data.Data;
-                        <RadzenChart >
-                            <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" Title="Weight" LineType="LineType.Dashed" ValueProperty="Weight">
-                                <RadzenMarkers MarkerType="MarkerType.Circle" />
-                                <RadzenSeriesDataLabels Visible="true" />
-                            </RadzenLineSeries>
-                            <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" Title="Stock" LineType="LineType.Dotted" ValueProperty="StockCount">
-                                <RadzenMarkers MarkerType="MarkerType.Square" />
-                                <RadzenSeriesDataLabels Visible="true" />
-                            </RadzenLineSeries>
-                            <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" Title="In" LineType="LineType.Dashed" ValueProperty="AddedCount">
-                                <RadzenMarkers MarkerType="MarkerType.Triangle" />
-                                <RadzenSeriesDataLabels Visible="true" />
-                            </RadzenLineSeries>
-                            <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" Title="Out" LineType="LineType.Dotted" ValueProperty="ConsumedCount">
-                                <RadzenMarkers MarkerType="MarkerType.Triangle" />
-                                <RadzenSeriesDataLabels Visible="true" />
-                            </RadzenLineSeries>
-                            <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" >
-                            </RadzenCategoryAxis>
-                            <RadzenValueAxis Formatter="@FormatAsNumeric">
-                                <RadzenGridLines Visible="true" />
-                                <RadzenAxisTitle Text="@name" />
-                            </RadzenValueAxis>
-                        </RadzenChart>
+                if (selectedData != null) {
+                    foreach (ChartData data in selectedData) {
+                        if (data.Data != null && data.Data.Any()) {
+                            string? name = data.Name;
+                            List<CosnumptionModel> models = data.Data;
+                            <h5>@name</h5>
+                            <RadzenChart>
+                                <RadzenLegend Position="LegendPosition.Bottom" />
+                                <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" ValueProperty="Weight" Title="Weight" LineType="LineType.Dashed">
+                                    <RadzenMarkers MarkerType="MarkerType.Circle" />
+                                    <RadzenSeriesDataLabels Visible="true" />
+                                </RadzenLineSeries>
+                                <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" ValueProperty="StockCount" Title="Stock" LineType="LineType.Dotted">
+                                    <RadzenMarkers MarkerType="MarkerType.Square" />
+                                    <RadzenSeriesDataLabels Visible="true" />
+                                </RadzenLineSeries>
+                                <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" ValueProperty="AddedCount" Title="In" LineType="LineType.Dashed">
+                                    <RadzenMarkers MarkerType="MarkerType.Triangle" />
+                                    <RadzenSeriesDataLabels Visible="true" />
+                                </RadzenLineSeries>
+                                <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" ValueProperty="ConsumedCount" Title="Out" LineType="LineType.Dotted">
+                                    <RadzenMarkers MarkerType="MarkerType.Diamond" />
+                                    <RadzenSeriesDataLabels Visible="true" />
+                                </RadzenLineSeries>
+                                <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth">
+                                </RadzenCategoryAxis>
+                                <RadzenValueAxis Formatter="@FormatAsNumeric">
+                                    <RadzenGridLines Visible="true" />
+                                </RadzenValueAxis>
+                            </RadzenChart>
                         }
                     }
-
                 }
+            }
+
+            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
+                <h4>Availability Chart</h4>
+            </RadzenCard>
+            @{
+                if (products != null && products.Any()) {
+                    string chartHeight = $"height:{products.Count * 30}px";
+                    <RadzenChart style="@chartHeight">
+                        <RadzenLegend Position="LegendPosition.Bottom" />
+                        <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="Qty" ValueProperty="Quantity" Fill="" Stroke="Black" StrokeWidth="2">
+                            <RadzenSeriesDataLabels Visible="true" />
+                        </RadzenStackedBarSeries>
+                        <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="Weight" ValueProperty="Weight" Stroke="Black" StrokeWidth="2">
+                            <RadzenSeriesDataLabels Visible="true"/>
+                        </RadzenStackedBarSeries>
+                        <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="EQty" ValueProperty="ExpiredQuantity" Stroke="Black" StrokeWidth="2" Hidden="true">
+                            <RadzenSeriesDataLabels Visible="true" />
+                        </RadzenStackedBarSeries>
+                        <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="EWeight" ValueProperty="ExpiredWeight" Stroke="Black" StrokeWidth="2" Hidden="true">
+                            <RadzenSeriesDataLabels Visible="true" />
+                        </RadzenStackedBarSeries>
+                        <RadzenCategoryAxis >
+                        </RadzenCategoryAxis>
+                        <RadzenValueAxis Formatter="@FormatAsNumeric" Min="0">
+                            <RadzenGridLines Visible="true" />
+                        </RadzenValueAxis>
+                        <RadzenBarOptions Radius="5" Margin="0"/>
+                    </RadzenChart>
+                }
+            }
         </div>
     </div>
 </div>

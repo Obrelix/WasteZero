@@ -4,8 +4,7 @@
 @using WasteZero.Data
 @using WasteZero.Models
 @using WasteZero.Services
-@page "/"
-@inject IDbContextFactory<WasteZeroDbContext> ProjectDataContextFactory;
+@page "/Warehouse"
 @inject NavigationManager NavigationManager
 @inject ProductService service
 @inject ProductTypeService ptService
@@ -76,7 +75,7 @@
                 colNameWidth = "40%";
                 colTypeWidth = "30%";
                 colGFWidth = "10%";
-                colQTYWidth = "15%";
+                colQTYWidth = "10%";
                 colWGHWidth = "10%";
                 colActionsWidth = "0%";
             }
@@ -91,7 +90,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Product" Property="ProductTypeID" Title="Type" Filterable="false" Width="@colTypeWidth" MinWidth="42px">
             <Template Context="obj">
-                <p style="white-space:pre-wrap">@obj.ProductType?.Code</p>
+                <p style="white-space:pre-wrap">@obj.ProductType?.Name</p>
             </Template>
             <EditTemplate Context="obj">
                 <RadzenDropDown @bind-Value="obj.ProductTypeID" Data="@productTypes" ValueProperty="Id" Style="width:500%; display: block;">
@@ -101,12 +100,12 @@
                 </RadzenDropDown>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Product" Property="IsGlutenFree" Title="GF" TextAlign="TextAlign.Center" Width="@colGFWidth" MinWidth="34px">
+        <RadzenDataGridColumn TItem="Product" Property="IsGlutenFree" Title="GF" TextAlign="TextAlign.Center" Width="@colGFWidth" MinWidth="40px">
             <Template Context="obj">
-                <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:100%; display: inline-flex;" Disabled="true" />
+                <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:30px; display: inline-flex;" Disabled="true" />
             </Template>
             <EditTemplate Context="obj">
-                <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:100%; display: inline-flex;" />
+                <RadzenCheckBox @bind-Value="obj.IsGlutenFree" Style="width:30px; display: inline-flex;" />
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Product" Property="Quantity" Title="Quantity" Filterable="false" Sortable="false" Width="@colQTYWidth">
@@ -116,7 +115,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Product" Property="Weight" Title="Weight" Filterable="false" Sortable="false" Width="@colWGHWidth" MinWidth="60px">
             <Template>
-                <p style="white-space:pre-wrap">@context.Weight</p>
+                <p style="white-space:pre-wrap">@string.Format("{0} kg",context.Weight)</p>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Product" Context="product" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Title="Actions" Width="@colActionsWidth" Visible=@(objToInsert != null || objToUpdate != null || EditEnabled)>

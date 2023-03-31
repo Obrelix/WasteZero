@@ -16,6 +16,37 @@ namespace WasteZero.Models
         public IEnumerable<ProductDetail>? Details { get; set; }
         public IEnumerable<ConsumedDetail>? ConsumedDetails { get; set; }
         [NotMapped]
+        public List<ProductDetail>? ExpiredDetails {
+            get {
+                if (this.Details == null)
+                    return new List<ProductDetail>();
+                else
+                    return this.Details.Where(x=>x.Status!= ExprirationStatus.ok && x.Status != ExprirationStatus.noDetails).ToList();
+            }
+        }
+        [NotMapped]
+        public int? ExpiredQuantity {
+            get {
+                if (this.ExpiredDetails == null)
+                    return 0;
+                else
+                    return this.ExpiredDetails.Count();
+            }
+        }
+        [NotMapped]
+        public float ExpiredWeight {
+            get {
+                if (this.ExpiredDetails == null)
+                    return 0.0f;
+                else {
+                    float? sum = this.ExpiredDetails?.Select(x => x.Weight).Sum();
+                    if (sum != null && sum.HasValue)
+                        return (float)Math.Round(sum.Value, 3);
+                    else return 0.0f;
+                }
+            }
+        }
+        [NotMapped]
         public int? Quantity {
             get {
                 if (this.Details == null)

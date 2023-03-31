@@ -74,19 +74,10 @@ namespace WasteZero.Pages {
         async Task InsertRow() {
             FromMasterInsert = true;
             objToInsert = new Product();
-            objToInsert.Id = Guid.NewGuid(); 
-            //objToInsertDetail = new ProductDetail() { 
-            //Id = Guid.NewGuid(),
-            //ProductID = objToInsert.Id,
-            //AddedDate = DateTime.Now
-            //};
-            objToInsert.Details = new List<ProductDetail>() /*{ objToInsertDetail }*/;
+            objToInsert.Id = Guid.NewGuid();
+            objToInsert.Details = new List<ProductDetail>();
             await grid!.InsertRow(objToInsert);
             await grid!.ExpandRow(objToInsert);
-            //if (gridDetail != null) {
-            //    await gridDetail!.InsertRow(objToInsertDetail);
-            //    await gridDetail!.EditRow(objToInsertDetail);
-            //}
         }
 
         async Task OnCreateRow(Product product) {
@@ -223,6 +214,7 @@ namespace WasteZero.Pages {
                 }
             }
         }
+
         async Task InsertRowDetail(Guid parentID) {
             objToInsertDetail = new ProductDetail();
             objToInsertDetail.Id = Guid.NewGuid();
@@ -230,16 +222,19 @@ namespace WasteZero.Pages {
             objToInsertDetail.AddedDate = DateTime.Now;
             await gridDetail!.InsertRow(objToInsertDetail);
             if(FromMasterInsert && objToInsert != null && objToInsert.Details!=null) {
-                List<ProductDetail> details = (List<ProductDetail>?)objToInsert.Details;
+                List<ProductDetail> details = (List<ProductDetail>)objToInsert.Details;
                 details!.Add(objToInsertDetail);
             }
         }
+
         void ChangeEditStatus() {
             EditEnabled = !EditEnabled;
         }
+
         void ChangeEditDetailStatus() {
             EditDetailEnabled = !EditDetailEnabled;
         }
+
         void OnCreateRowDetail(ProductDetail detail) {
             service.CreateDetail(detail);
             objToInsertDetail = null;

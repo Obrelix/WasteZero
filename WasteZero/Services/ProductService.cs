@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using WasteZero.Data;
 using WasteZero.Models;
 
@@ -10,11 +11,24 @@ namespace WasteZero.Services {
             dbContext = context;
         }
         public IQueryable<Product>? GetAllObjectsQuerable() {
+            //dbContext?.ChangeTracker.Clear();
             IQueryable<Product>? result = dbContext?.Products?
             .Include(x=>x.ProductType)
             .Include(x => x.Details)
             .Include(x=>x.ConsumedDetails)
             .AsQueryable();
+            return result;
+        }
+        public List<Product>? GetExpiredObjects() {
+            List<ExprirationStatus> expiredObjects = new List<ExprirationStatus>() { ExprirationStatus.almost ,ExprirationStatus.soon, ExprirationStatus.expired };
+            List<Product>? result = dbContext?.Products?
+            .Include(x => x.ProductType)
+            .Include(x => x.Details)
+            .ToList()
+            .Where(x => x.Status != null && expiredObjects.Contains((ExprirationStatus)x.Status))
+            .OrderBy(x => x.MinDetailExpDate)
+            .ThenBy(x => x.Name)
+            .ToList();
             return result;
         }
         public IQueryable<ProductDetail>? GetAllDetailsQuerable(Guid parentID) {
