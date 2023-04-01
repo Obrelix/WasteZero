@@ -31,15 +31,6 @@ namespace WasteZero.Pages {
         protected override async Task OnInitializedAsync() {
             await base.OnInitializedAsync();
             consItems = service.GetAllObjectsCons(startDate, endDate);
-            if(consItems != null) {
-                Guid? guid = consItems.FirstOrDefault()?.ProductID;
-                if (guid != null) {
-                    productIDs = new List<Guid>() { guid.Value };
-                    ChartData? obj = consItems!.FirstOrDefault(x => x.ProductID.Equals(guid));
-                    if (obj != null)
-                        selectedData = new List<ChartData>() { obj };
-                }
-            }
             expiredProducts = pservice.GetExpiredObjects();
             products = pservice.GetAllObjectsQuerable()?.ToList();
             productTypes = ptService.GetAllObjectsQuerable();
