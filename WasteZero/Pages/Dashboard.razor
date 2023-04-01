@@ -56,7 +56,7 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Product" Property="ExpiredWeight" Title="Weight" Filterable="false" Sortable="false" Width="15%" MinWidth="60px">
                         <Template>
-                            <p style="white-space:pre-wrap">@string.Format("{0} kg",context.ExpiredQuantity)</p>
+                            <p style="white-space:pre-wrap">@string.Format("{0} kg",context.ExpiredWeight)</p>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -80,31 +80,34 @@
                         if (data.Data != null && data.Data.Any()) {
                             string? name = data.Name;
                             List<CosnumptionModel> models = data.Data;
+                            DateTime now = DateTime.Now;
+                            TimeSpan step = TimeSpan.FromDays(30.6); //DateTime.Now.Subtract(DateTime.Now.AddMonths(1));
                             <h5>@name</h5>
                             <RadzenChart>
                                 <RadzenLegend Position="LegendPosition.Bottom" />
-                                <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" ValueProperty="Weight" Title="Weight" LineType="LineType.Dashed">
-                                    <RadzenMarkers MarkerType="MarkerType.Circle" />
-                                    <RadzenSeriesDataLabels Visible="true" />
-                                </RadzenLineSeries>
-                                <RadzenLineSeries Smooth="true" Data="@models" CategoryProperty="Date" ValueProperty="StockCount" Title="Stock" LineType="LineType.Dotted">
-                                    <RadzenMarkers MarkerType="MarkerType.Square" />
-                                    <RadzenSeriesDataLabels Visible="true" />
-                                </RadzenLineSeries>
-                                <RadzenColumnSeries Data="@models" CategoryProperty="Date" ValueProperty="AddedCount" Title="In" LineType="LineType.Dashed" Hidden="true">
+                                <RadzenColumnSeries Data="@models" TItem="CosnumptionModel" CategoryProperty="Date" ValueProperty="AddedCount" Title="In" LineType="LineType.Dashed">
                                     <RadzenMarkers MarkerType="MarkerType.Triangle" />
                                     <RadzenSeriesDataLabels Visible="true" />
                                 </RadzenColumnSeries>
-                                <RadzenColumnSeries Data="@models" CategoryProperty="Date" ValueProperty="ConsumedCount" Title="Out" LineType="LineType.Dotted" Hidden="true">
+                                <RadzenColumnSeries Data="@models" TItem="CosnumptionModel" CategoryProperty="Date" ValueProperty="ConsumedCount" Title="Out" LineType="LineType.Dotted">
                                     <RadzenMarkers MarkerType="MarkerType.Diamond" />
                                     <RadzenSeriesDataLabels Visible="true" />
                                 </RadzenColumnSeries>
-                                <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth">
+                                <RadzenLineSeries Smooth="true" Data="@models" TItem="CosnumptionModel" CategoryProperty="Date" ValueProperty="Weight" Title="Weight" LineType="LineType.Dashed">
+                                    <RadzenMarkers MarkerType="MarkerType.Circle" />
+                                    <RadzenSeriesDataLabels Visible="true" />
+                                </RadzenLineSeries>
+                                <RadzenLineSeries Smooth="true" Data="@models" TItem="CosnumptionModel" CategoryProperty="Date" ValueProperty="StockCount" Title="Stock" LineType="LineType.Dotted">
+                                    <RadzenMarkers MarkerType="MarkerType.Square" />
+                                    <RadzenSeriesDataLabels Visible="true">
+                                    </RadzenSeriesDataLabels>
+                                </RadzenLineSeries>
+                                <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" Step="@step">
                                 </RadzenCategoryAxis>
                                 <RadzenValueAxis Formatter="@FormatAsNumeric">
                                     <RadzenGridLines Visible="true" />
                                 </RadzenValueAxis>
-                                <RadzenColumnOptions Radius="5" Margin="0"/>
+                                <RadzenColumnOptions Radius="5" Margin="0" />
                             </RadzenChart>
                         }
                     }
@@ -116,14 +119,14 @@
             </RadzenCard>
             @{
                 if (products != null && products.Any()) {
-                    string chartHeight = $"height:{products.Count * 30}px";
+                    string chartHeight = $"height:{(products.Count * 20) + 150}px";
                     <RadzenChart style="@chartHeight">
                         <RadzenLegend Position="LegendPosition.Bottom" />
                         <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="Qty" ValueProperty="Quantity" Fill="" Stroke="Black" StrokeWidth="2">
                             <RadzenSeriesDataLabels Visible="true" />
                         </RadzenStackedBarSeries>
                         <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="Weight" ValueProperty="Weight" Stroke="Black" StrokeWidth="2">
-                            <RadzenSeriesDataLabels Visible="true"/>
+                            <RadzenSeriesDataLabels Visible="true" />
                         </RadzenStackedBarSeries>
                         <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="EQty" ValueProperty="ExpiredQuantity" Stroke="Black" StrokeWidth="2" Hidden="true">
                             <RadzenSeriesDataLabels Visible="true" />
@@ -131,12 +134,12 @@
                         <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="EWeight" ValueProperty="ExpiredWeight" Stroke="Black" StrokeWidth="2" Hidden="true">
                             <RadzenSeriesDataLabels Visible="true" />
                         </RadzenStackedBarSeries>
-                        <RadzenCategoryAxis >
+                        <RadzenCategoryAxis>
                         </RadzenCategoryAxis>
-                        <RadzenValueAxis Formatter="@FormatAsNumeric" Min="0">
+                        <RadzenValueAxis Formatter="@FormatAsNumeric" Min="0" Step="1">
                             <RadzenGridLines Visible="true" />
                         </RadzenValueAxis>
-                        <RadzenBarOptions Radius="5" Margin="0"/>
+                        <RadzenBarOptions Radius="5" Margin="0" />
                     </RadzenChart>
                 }
             }

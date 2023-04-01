@@ -39,8 +39,8 @@ namespace WasteZero.Models
                 if (this.ExpiredDetails == null)
                     return 0.0f;
                 else {
-                    float? sum = this.ExpiredDetails?.Where(x=>x.Weight!=null).Sum(x => x.Weight);
-                    if (sum != null && sum.HasValue)
+                    float? sum = this.ExpiredDetails?.Where(x=>x.Weight.HasValue).Sum(x => x.Weight!.Value);
+                    if (sum.HasValue)
                         return (float)Math.Round(sum.Value, 3);
                     else return 0.0f;
                 }
@@ -61,7 +61,7 @@ namespace WasteZero.Models
                 if(this.Details == null) 
                     return 0.0f;
                 else {
-                    float? sum = this.Details?.Where(x => x.Weight != null).Sum(x => x.Weight);
+                    float? sum = this.Details?.Where(x => x.Weight.HasValue).Sum(x => x.Weight!.Value);
                     if (sum != null && sum.HasValue)
                         return (float)Math.Round(sum.Value,3);
                     else return 0.0f;

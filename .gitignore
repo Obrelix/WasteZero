@@ -5,6 +5,7 @@ bin-release/
 [Bb]in/
 .vs/
 WasteZero/.vs
+WasteZero/Data.db
 
 # Other files and folders
 .settings/
@@ -18,3 +19,5 @@ WasteZero/.vs
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important
 # information for Eclipse / Flash Builder.
+WasteZero/Data.db
+*.db

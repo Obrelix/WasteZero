@@ -17,12 +17,21 @@ namespace WasteZero.Pages {
         DateTime startDate { get; set; } = DateTime.Now.AddYears(-1).Date;
         DateTime endDate { get; set; } = DateTime.Now.AddMonths(2).Date;
         string FormatAsNumeric(object value) {
-            return ((double)value).ToString("N", CultureInfo.CreateSpecificCulture("en-US"));
+            double? num = value as double?;
+            if (num.HasValue) {
+                if (num % 1 > 0)
+                    return num.Value.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"));
+                else if (num == 0)
+                    return string.Empty;
+                else
+                    return ((double)value).ToString();
+            }
+            return string.Empty;
         }
 
         string FormatAsMonth(object value) {
             if (value != null) {
-                return Convert.ToDateTime(value).ToString("dd/MM/yy");
+                return Convert.ToDateTime(value).ToString("MM/yy");
             }
 
             return string.Empty;
