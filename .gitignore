@@ -5,7 +5,6 @@ bin-release/
 [Bb]in/
 .vs/
 WasteZero/.vs
-WasteZero/Migrations
 
 # Other files and folders
 .settings/

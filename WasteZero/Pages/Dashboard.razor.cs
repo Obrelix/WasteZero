@@ -14,6 +14,8 @@ namespace WasteZero.Pages {
         List<Product>? expiredProducts { get; set; }
         List<Product>? products { get; set; }
         IEnumerable<ProductType>? productTypes { get; set; }
+        DateTime startDate { get; set; } = DateTime.Now.AddYears(-1).Date;
+        DateTime endDate { get; set; } = DateTime.Now.AddMonths(2).Date;
         string FormatAsNumeric(object value) {
             return ((double)value).ToString("N", CultureInfo.CreateSpecificCulture("en-US"));
         }
@@ -28,7 +30,7 @@ namespace WasteZero.Pages {
 
         protected override async Task OnInitializedAsync() {
             await base.OnInitializedAsync();
-            consItems = service.GetAllObjectsCons();
+            consItems = service.GetAllObjectsCons(startDate, endDate);
             if(consItems != null) {
                 Guid? guid = consItems.FirstOrDefault()?.ProductID;
                 if (guid != null) {
@@ -105,17 +107,24 @@ namespace WasteZero.Pages {
             }
         }
 
-        void ChangeData(object value) {
+        void ChangeChartData(object value) {
             if (selectedData == null)
                 selectedData = new List<ChartData>();
             else 
                 selectedData.Clear();
-            if(productIDs != null)
-                foreach(Guid guid in productIDs) {
-                    ChartData? obj = consItems!.FirstOrDefault(x=>x.ProductID.Equals(guid));
-                    if (obj != null)
-                        selectedData.Add(obj);
-                }
+            consItems = service.GetAllObjectsCons(startDate, endDate);
+            if (productIDs != null && consItems != null)
+                selectedData.AddRange(consItems.Where(x => productIDs.Contains(x.ProductID)));
+        }
+        void ChangeChartData(DateTime? date) {
+            if (selectedData == null)
+                selectedData = new List<ChartData>();
+            else
+                selectedData.Clear();
+            if (!date.HasValue) return;
+            consItems = service.GetAllObjectsCons(startDate, endDate);
+            if (productIDs != null && consItems != null )
+                selectedData.AddRange(consItems.Where(x => productIDs.Contains(x.ProductID)));
         }
     }
 }

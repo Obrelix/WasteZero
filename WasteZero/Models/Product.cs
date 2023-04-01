@@ -39,7 +39,7 @@ namespace WasteZero.Models
                 if (this.ExpiredDetails == null)
                     return 0.0f;
                 else {
-                    float? sum = this.ExpiredDetails?.Select(x => x.Weight).Sum();
+                    float? sum = this.ExpiredDetails?.Where(x=>x.Weight!=null).Sum(x => x.Weight);
                     if (sum != null && sum.HasValue)
                         return (float)Math.Round(sum.Value, 3);
                     else return 0.0f;
@@ -61,7 +61,7 @@ namespace WasteZero.Models
                 if(this.Details == null) 
                     return 0.0f;
                 else {
-                    float? sum = this.Details?.Select(x => x.Weight).Sum();
+                    float? sum = this.Details?.Where(x => x.Weight != null).Sum(x => x.Weight);
                     if (sum != null && sum.HasValue)
                         return (float)Math.Round(sum.Value,3);
                     else return 0.0f;
@@ -74,7 +74,7 @@ namespace WasteZero.Models
                 if (this.Details == null || !this.Details.Any())
                     return ExprirationStatus.noDetails;
                 else {
-                    DateTime? minExpDate = this.Details.Where(x=> x.ExpirationDate != null).Select(x=>x.ExpirationDate).Min();
+                    DateTime? minExpDate = this.Details.Where(x=> x.ExpirationDate != null).Min(x=>x.ExpirationDate);
                     if(!minExpDate.HasValue)
                         return ExprirationStatus.noDetails;
                     if (minExpDate <= DateTime.Now.Date)

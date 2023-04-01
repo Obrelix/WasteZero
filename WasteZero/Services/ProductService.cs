@@ -24,11 +24,13 @@ namespace WasteZero.Services {
             List<Product>? result = dbContext?.Products?
             .Include(x => x.ProductType)
             .Include(x => x.Details)
-            .ToList()
-            .Where(x => x.Status != null && expiredObjects.Contains((ExprirationStatus)x.Status))
-            .OrderBy(x => x.MinDetailExpDate)
-            .ThenBy(x => x.Name)
             .ToList();
+            if(result!=null && result.Any()) {
+                result = result.Where(x => x.Status != null && expiredObjects.Contains((ExprirationStatus)x.Status))
+                .OrderBy(x => x.MinDetailExpDate)
+                .ThenBy(x => x.Name)
+                .ToList();
+            }
             return result;
         }
         public IQueryable<ProductDetail>? GetAllDetailsQuerable(Guid parentID) {

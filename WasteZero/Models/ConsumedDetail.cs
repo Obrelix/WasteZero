@@ -11,6 +11,7 @@ namespace WasteZero.Models {
         public Guid? ProductID { get; set; }
         public Product? Product { get; set; }
         public DateTime? AddedDate { get; set; }
+        public DateTime? ParentAddedDate { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public float? Weight { get; set; }
     }
