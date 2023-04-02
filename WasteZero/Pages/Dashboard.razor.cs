@@ -19,19 +19,22 @@ namespace WasteZero.Pages {
         string FormatAsNumeric(object value) {
             double? num = value as double?;
             if (num.HasValue) {
-                if (num % 1 > 0)
-                    return num.Value.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"));
-                else if (num == 0)
-                    return string.Empty;
-                else
-                    return ((double)value).ToString();
+                if (num % 1 > 0) {
+                    string returnData = num.Value.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"));
+                    if (returnData[returnData.Length -1 ] == '0') {
+                        return returnData.Substring(0, returnData.Length-1);
+                    } else
+                        return returnData;
+                }
+                else if (num.Value != 0.0d)
+                    return num.Value.ToString();
             }
             return string.Empty;
         }
 
         string FormatAsMonth(object value) {
             if (value != null) {
-                return Convert.ToDateTime(value).ToString("MM/yy");
+                return Convert.ToDateTime(value).ToString("M/yy");
             }
 
             return string.Empty;

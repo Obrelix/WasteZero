@@ -85,11 +85,11 @@
                             <h5>@name</h5>
                             <RadzenChart>
                                 <RadzenLegend Position="LegendPosition.Bottom" />
-                                <RadzenColumnSeries Data="@models" TItem="CosnumptionModel" CategoryProperty="Date" ValueProperty="AddedCount" Title="In" LineType="LineType.Dashed">
+                                <RadzenColumnSeries Data="@models" TItem="CosnumptionModel" CategoryProperty="Date" ValueProperty="AddedCount" Title="In" Stroke="Black" StrokeWidth="2">
                                     <RadzenMarkers MarkerType="MarkerType.Triangle" />
                                     <RadzenSeriesDataLabels Visible="true" />
                                 </RadzenColumnSeries>
-                                <RadzenColumnSeries Data="@models" TItem="CosnumptionModel" CategoryProperty="Date" ValueProperty="ConsumedCount" Title="Out" LineType="LineType.Dotted">
+                                <RadzenColumnSeries Data="@models" TItem="CosnumptionModel" CategoryProperty="Date" ValueProperty="ConsumedCount" Title="Out" Stroke="Black" StrokeWidth="2">
                                     <RadzenMarkers MarkerType="MarkerType.Diamond" />
                                     <RadzenSeriesDataLabels Visible="true" />
                                 </RadzenColumnSeries>
@@ -107,7 +107,7 @@
                                 <RadzenValueAxis Formatter="@FormatAsNumeric">
                                     <RadzenGridLines Visible="true" />
                                 </RadzenValueAxis>
-                                <RadzenColumnOptions Radius="5" Margin="0" />
+                                <RadzenColumnOptions Radius="5" Margin="0" Width="20"/>
                             </RadzenChart>
                         }
                     }
@@ -122,7 +122,7 @@
                     string chartHeight = $"height:{(products.Count * 20) + 150}px";
                     <RadzenChart style="@chartHeight">
                         <RadzenLegend Position="LegendPosition.Bottom" />
-                        <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="Qty" ValueProperty="Quantity" Fill="" Stroke="Black" StrokeWidth="2">
+                        <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="Qty" ValueProperty="Quantity"  Fill="LightBlue"  Stroke="Black" StrokeWidth="2">
                             <RadzenSeriesDataLabels Visible="true" />
                         </RadzenStackedBarSeries>
                         <RadzenStackedBarSeries Data="@products" TItem="Product" CategoryProperty="Name" Title="Weight" ValueProperty="Weight" Stroke="Black" StrokeWidth="2">

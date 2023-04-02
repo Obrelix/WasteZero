@@ -90,3 +90,8 @@ a, .btn-link {
     row-gap: 5px;
     flex-wrap: wrap;
 }
+.rz-series-data-label {
+    fill: white;
+    stroke: black;
+    stroke-width: 0.6px;
+}
