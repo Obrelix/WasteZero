@@ -24,5 +24,5 @@ This project is licensed under the [MIT License](https://github.com/Obrelix/Wast
 
 ## Images
 
- ![alt text](https://github.com/Obrelix/WasteZero/blob/main/Images/Capture1.png?raw=true)
- ![alt text](https://github.com/Obrelix/WasteZero/blob/main/Images/Capture2.png?raw=true)
+ ![alt text](https://github.com/Obrelix/WasteZero/blob/main/Images/Capture1.PNG?raw=true)
+ ![alt text](https://github.com/Obrelix/WasteZero/blob/main/Images/Capture2.PNG?raw=true)
