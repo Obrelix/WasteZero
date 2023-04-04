@@ -57,6 +57,8 @@ namespace WasteZero.Services {
                         result.Add(chart);
                     }
                 }
+            var x = 0;
+            x ++;
             return result;
         }
         private DateTime GetStartOfMonth(DateTime date) {
